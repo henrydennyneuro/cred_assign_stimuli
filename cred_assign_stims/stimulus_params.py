@@ -4,7 +4,7 @@ import numpy as np
 import itertools
 import time
 
-from camstim import Stimulus
+from camstim import Stimulus, MovieStim
 from cred_assign_stims import CredAssignStims
 
 """ Functions to initialize parameters for Gabors or Squares, and present and record stimuli.
