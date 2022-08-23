@@ -517,23 +517,60 @@ class CredAssignStims(ElementArrayStim):
         self.setXYs(pos, operation, log)
         self._stim_updated = True
     
-    def setPosSizesAll(self, combo, operation="", log=None):
+    def setPosSizesAll(self, combo, operation='', log=None):
         """Allows Sweeps to set which pos/size combo to use where
         0, 1, 2, 3 = A, B, C, D.
         4 is set manually below (U)
         """
-        
-        # if it's the D (4th set) of a surprise round, switch orientation mu
-        # and switch positions to U
+
+        # AMENDED FOR PRODUCTION V2
+        # if it's the D (4th set) of a surprise round, either switch orientation mu
+        # and switch positions to U (surp type 1) or switch orientation mu and keep D 
+        # positions (surp type 2)
         # note: this is done here because the sweep visits the highest level param last
-        if self._surp == 1 and combo == 3:
-            pos = self.possizes[4][0]
-            sizes = self.possizes[4][1]
-            self._orimu = (self._orimu + 90)%360
+
+        # Set whether this is a rotating trial or a fixed-mu trial
+
+        #if rotate == 1:
+        #    self.ctrl = True
+        #else:
+        #    self.ctrl = False
+
+        # Determine trial type and rotate mu's accordingly
+
+        if self._ctrl == True: 
+            if self._surp != 0 and combo == 3:
+
+                if self._surp == 1:
+                    possize_idx = 4
+                elif self._surp == 2:
+                    possize_idx = 3
+                else:
+                    raise ValueError("self._surp must be 0, 1 or 2.")
+
+                pos = self.possizes[possize_idx][0]
+                sizes = self.possizes[possize_idx][1]
+                self._orimu = (self._orimu + 180)%360
+            else:
+                pos = self.possizes[combo][0]
+                sizes = self.possizes[combo][1]
+                self._orimu = (self._orimu + combo*90)%360
         
-        else:
-            pos = self.possizes[combo][0]
-            sizes = self.possizes[combo][1]
+        if self._ctrl == False:
+            if self._surp != 0 and combo == 3:
+                if self._surp == 1:
+                    possize_idx = 4
+                elif self._surp == 2:
+                    possize_idx = 3
+                else:
+                    raise ValueError("self._surp must be 0, 1 or 2.")
+
+                pos = self.possizes[possize_idx][0]
+                sizes = self.possizes[possize_idx][1]
+                self._orimu = (self._orimu + 90)%360
+            else:
+                pos = self.possizes[combo][0]
+                sizes = self.possizes[combo][1]
         
         self.setXYs(pos, operation, log)
         self.setSizes(sizes, operation, log)
@@ -541,7 +578,13 @@ class CredAssignStims(ElementArrayStim):
     
         # resample orientations each time new positions and sizes are set
         self.setOriParams(operation, log)
-        self._stim_updated = True
+        self._needupdate = True
+    
+#    def _check_keys(self):
+#        for keys in event.getKeys(timeStamped=True):
+#            if keys[0]in ['escape', 'q']:
+#                self._escape_pressed = True
+#                self.win.close()
     
     def _stimOriginVar(self):
         """Get variables relevant to determining where to initialize stimuli
