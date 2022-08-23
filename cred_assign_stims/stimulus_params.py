@@ -4,6 +4,7 @@ import numpy as np
 import itertools
 import time
 
+from psychopy import visual
 from camstim import Stimulus, MovieStim
 from cred_assign_stims import CredAssignStims
 
