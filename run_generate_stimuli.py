@@ -13,12 +13,17 @@ from cred_assign_stims.generate_stimuli import generate_stimuli, \
 # For full ophys recording (70 min)
 SESSION_PARAMS_OPHYS = {
     "type": "ophys", # type of session (habituation or ophys)
-    "session_dur": 70 * 60, # expected total session duration (sec)
+    "session_dur": 4118.7, # expected total session duration (sec)
     "pre_blank": 30, # blank before stim starts (sec)
     "post_blank": 30, # blank after all stims end (sec)
     "inter_blank": 30, # blank between all stims (sec)
-    "gab_dur": 34 * 60, # duration of gabor block (sec)
-    "sq_dur": 17 * 60, # duration of each visual flow block (2 blocks total) (sec)
+    "gab_dur": 450, # duration of gabor block (sec)
+    "rot_gab_dur": 450,
+    "sq_dur": 0 * 60, # duration of each visual flow block (2 blocks total) (sec)
+    "movie_dur": 1800,
+    "movie_blocks": 15,
+    "gratings_dur": 26, #runs. 1 run = 14.7s so 382.2s
+    "movie_folder": "C:\Users\Henry Denny\Documents\Richards_lab_Stim_Protocol\cred_assign_stimuli-main\natural_movies\stims"
     }
 
 # For a test ophys run (2 min)
@@ -29,7 +34,12 @@ SESSION_PARAMS_TEST = {
     "post_blank": 5,
     "inter_blank": 5,
     "gab_dur": 33,
-    "sq_dur": 32,
+    "rot_gab_dur": 33,
+    "sq_dur": 0, # duration of each visual flow block (2 blocks total) (sec)
+    "movie_dur": 120,
+    "movie_blocks": 1,
+    "gratings_dur": 1, #runs. 1 run = 14.7s so 382.2s
+    "movie_folder": "C:\Users\Henry Denny\Documents\Richards_lab_Stim_Protocol\cred_assign_stimuli-main\natural_movies\stims"
     }
 
 # For habituation recordings (10-60 min)
@@ -38,6 +48,13 @@ SESSION_PARAMS_HABITUATION = {
     "pre_blank": 30, 
     "post_blank": 30, 
     "inter_blank": 30, 
+    "gab_dur": 450, # duration of gabor block (sec)
+    "rot_gab_dur": 450,
+    "sq_dur": 0 * 60, # duration of each visual flow block (2 blocks total) (sec)
+    "movie_dur": 1800,
+    "movie_blocks": 15,
+    "gratings_dur": 26, #runs. 1 run = 14.7s so 382.2s
+    "movie_folder": "C:\Users\Henry Denny\Documents\Richards_lab_Stim_Protocol\cred_assign_stimuli-main\natural_movies\stims"
     }
 
 # For a test habituation run (22 sec)
@@ -49,6 +66,13 @@ SESSION_PARAMS_TEST_HAB = {
     "inter_blank": 1,
     "gab_dur": 6,
     "sq_dur": 6,
+    "gab_dur": 33,
+    "rot_gab_dur": 33,
+    "sq_dur": 0, # duration of each visual flow block (2 blocks total) (sec)
+    "movie_dur": 120,
+    "movie_blocks": 1,
+    "gratings_dur": 1, #runs. 1 run = 14.7s so 382.2s
+    "movie_folder": "C:\Users\Henry Denny\Documents\Richards_lab_Stim_Protocol\cred_assign_stimuli-main\natural_movies\stims"
     }
 
 # sq_dur for each habituation recording length
