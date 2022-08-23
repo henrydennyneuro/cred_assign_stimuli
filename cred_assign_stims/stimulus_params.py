@@ -387,7 +387,7 @@ def init_run_squares(window, direc, session_params, recordPos, square_params=SQU
             }
     
     # Create the stimulus array
-    squares = OurStims(window, elemPar, fieldsize, direc=direc, speed=speed,
+    squares = CredAssignStims(window, elemPar, fieldsize, direc=direc, speed=speed,
                          flipfrac=square_params['flipfrac'],
                          currval=fliparray[0],
                          rng=session_params['rng'])
@@ -492,7 +492,7 @@ def init_run_gabors(window, session_params, recordOris, gabor_params=GABOR_PARAM
             }
     
     # Create the stimulus array 
-    gabors = OurStims(window, elemPar, fieldsize, orikappa=kap,
+    gabors = CredAssignStims(window, elemPar, fieldsize, orikappa=kap,
                           possizes=session_params['possize'],
                           rng=session_params['rng'])
     
@@ -596,7 +596,7 @@ def init_rotate_gabors(window, session_params, recordOris, gabor_params=GABOR_PA
             }
 
     # Create the stimulus array 
-    gabors = OurStims(window, elemPar, fieldsize, orikappa=kap,
+    gabors = CredAssignStims(window, elemPar, fieldsize, orikappa=kap,
                           possizes=session_params['possize'],
                           rng=session_params['rng'])
 
