@@ -24,6 +24,7 @@ from psychopy import monitors
 from camstim import Window, Warp
 
 import stimulus_params
+from stimulus_params import MOVIE_PARAMS
 from cred_assign_stims import SweepStimModif, unique_directory
 
 # Configuration settings used in the Credit Assignment project
@@ -189,6 +190,14 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     session_params['rng'].shuffle(gab_order) # in place shuffling
     session_params['rng'].shuffle(rot_gab_order) # in place shuffling
     session_params['rng'].shuffle(gab_block_order) # in place shuffling
+
+    displayorder = {}
+    if session_params['type'] == 'ophys':    
+        for i in np.arange(MOVIE_PARAMS['vids_per_block']):
+            displayorder[str(i)] = []
+    elif session_params['type'] == 'hab':
+        for i in np.arange(0, MOVIE_PARAMS['vids_per_block'], 4):
+            displayorder[str(i)] = []
 
     start = session_params["pre_blank"] # initial blank
     stimuli = []
