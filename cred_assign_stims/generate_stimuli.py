@@ -145,42 +145,42 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     window = Window(**window_kwargs)
    
     # initialize the stimuli
-    if SESSION_PARAMS['gab_dur'] != 0:
-        gb_1 = stimulus_params.init_run_gabors(window, SESSION_PARAMS.copy(), recordOris, surp=2)
+    if session_params['gab_dur'] != 0:
+        gb_1 = stimulus_params.init_run_gabors(window, session_params.copy(), recordOris, surp=2)
         
         # share positions and sizes
-        gb_2_session_params = SESSION_PARAMS.copy()
+        gb_2_session_params = session_params.copy()
         gb_2_session_params['possize'] = gb_1.stim_params['session_params']['possize']
         gb_2 = stimulus_params.init_run_gabors(window, gb_2_session_params, recordOris, surp=2)
         
         stim_order.append('g')
         gab_order = [1, 2]
         gab_block_order = [1, 2]
-    if SESSION_PARAMS['rot_gab_dur'] != 0:
+    if session_params['rot_gab_dur'] != 0:
         rgb_1 = stimulus_params.init_rotate_gabors(window, gb_2_session_params, recordOris, surp=2)
         
         # share positions and sizes from original Gabors. Keeps possize the same
         rgb_2 = stimulus_params.init_rotate_gabors(window, gb_2_session_params, recordOris, surp=2)
         rot_gab_order = [1, 2]
-    if SESSION_PARAMS['sq_dur'] != 0:
-        sq_left = stimulus_params.init_run_squares(window, 'left', SESSION_PARAMS.copy(), recordPos)
-        sq_right = stimulus_params.init_run_squares(window, 'right', SESSION_PARAMS.copy(), recordPos)
+    if session_params['sq_dur'] != 0:
+        sq_left = stimulus_params.init_run_squares(window, 'left', session_params.copy(), recordPos)
+        sq_right = stimulus_params.init_run_squares(window, 'right', session_params.copy(), recordPos)
         stim_order.append('b')
         sq_order = ['l', 'r']
-    if SESSION_PARAMS['movie_dur'] != 0:
-        mov, propblocks = stimulus_params.init_run_movies(window, SESSION_PARAMS.copy(), MOVIE_PARAMS, 1, SESSION_PARAMS['movie_folder'])
+    if session_params['movie_dur'] != 0:
+        mov, propblocks = stimulus_params.init_run_movies(window, session_params.copy(), MOVIE_PARAMS, 1, session_params['movie_folder'])
         stim_order.append('m')
         mov_order = np.arange(MOVIE_PARAMS['movie_n'])
-    if SESSION_PARAMS['gratings_dur'] != 0:
-        grt = stimulus_params.init_run_gratings(window, SESSION_PARAMS.copy())
+    if session_params['gratings_dur'] != 0:
+        grt = stimulus_params.init_run_gratings(window, session_params.copy())
         stim_order.append('grt')
 
     # initialize display order and times
-    SESSION_PARAMS['rng'].shuffle(stim_order) # in place shuffling
-    SESSION_PARAMS['rng'].shuffle(sq_order) # in place shuffling
-    SESSION_PARAMS['rng'].shuffle(gab_order) # in place shuffling
-    SESSION_PARAMS['rng'].shuffle(rot_gab_order) # in place shuffling
-    SESSION_PARAMS['rng'].shuffle(gab_block_order) # in place shuffling
+    session_params['rng'].shuffle(stim_order) # in place shuffling
+    session_params['rng'].shuffle(sq_order) # in place shuffling
+    session_params['rng'].shuffle(gab_order) # in place shuffling
+    session_params['rng'].shuffle(rot_gab_order) # in place shuffling
+    session_params['rng'].shuffle(gab_block_order) # in place shuffling
 
     start = session_params["pre_blank"] # initial blank
     stimuli = []
@@ -191,36 +191,36 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                     for j in gab_order:
                         if j == 1:
                             stimuli.append(gb_1)
-                            gb_1.set_display_sequence([(start, start+SESSION_PARAMS['gab_dur'])])
+                            gb_1.set_display_sequence([(start, start+session_params['gab_dur'])])
                         elif j == 2:
                             stimuli.append(gb_2)
-                            gb_2.set_display_sequence([(start, start+SESSION_PARAMS['gab_dur'])])
+                            gb_2.set_display_sequence([(start, start+session_params['gab_dur'])])
                         # update the new starting point for the next stim
-                        start += SESSION_PARAMS['gab_dur'] 
+                        start += session_params['gab_dur'] 
                 elif l == 2:
                     for j in rot_gab_order:
                         if j == 1:
                             stimuli.append(rgb_1)
-                            rgb_1.set_display_sequence([(start, start+SESSION_PARAMS['rot_gab_dur'])])
+                            rgb_1.set_display_sequence([(start, start+session_params['rot_gab_dur'])])
                         elif j == 2:
                             stimuli.append(rgb_2)
-                            rgb_2.set_display_sequence([(start, start+SESSION_PARAMS['rot_gab_dur'])])
-                        start += SESSION_PARAMS['gab_dur']
+                            rgb_2.set_display_sequence([(start, start+session_params['rot_gab_dur'])])
+                        start += session_params['gab_dur']
                         # update the new starting point for the next stim
-                start += SESSION_PARAMS['inter_blank']
+                start += session_params['inter_blank']
         elif i == 'b':
             for j in sq_order:
                 if j == 'l':
                     stimuli.append(sq_left)
-                    sq_left.set_display_sequence([(start, start+SESSION_PARAMS['sq_dur'])])
+                    sq_left.set_display_sequence([(start, start+session_params['sq_dur'])])
                 elif j == 'r':
                     stimuli.append(sq_right)
-                    sq_right.set_display_sequence([(start, start+SESSION_PARAMS['sq_dur'])])
+                    sq_right.set_display_sequence([(start, start+session_params['sq_dur'])])
                 # update the new starting point for the next stim
-                start += SESSION_PARAMS['sq_dur'] + SESSION_PARAMS['inter_blank'] 
+                start += session_params['sq_dur'] + session_params['inter_blank'] 
         elif i == 'm':
-            if SESSION_PARAMS['type'] == 'ophys':
-                for ii in np.arange(SESSION_PARAMS['movie_blocks']):
+            if session_params['type'] == 'ophys':
+                for ii in np.arange(session_params['movie_blocks']):
                     propblocksshuf = np.random.permutation(propblocks)
                     for j in propblocksshuf:
                         displayorder[str(j)].append((start, start+(MOVIE_PARAMS['movie_len'])-1))
@@ -228,8 +228,8 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                 for j in np.arange(MOVIE_PARAMS['vids_per_block']):
                     mov[str(j)].set_display_sequence(displayorder[str(j)])
                     stimuli.append(mov[str(j)])
-            elif SESSION_PARAMS['type'] == 'hab':
-                for ii in np.arange(SESSION_PARAMS['movie_blocks']):
+            elif session_params['type'] == 'hab':
+                for ii in np.arange(session_params['movie_blocks']):
                     propblocksshuf = np.random.permutation(propblocks)
                     for j in propblocksshuf:
                         displayorder[str(j)].append((start, start+(MOVIE_PARAMS['movie_len'])-1))
@@ -237,12 +237,12 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                 for j in np.arange(0, MOVIE_PARAMS['vids_per_block'], 4):
                     mov[str(j)].set_display_sequence(displayorder[str(j)])
                     stimuli.append(mov[str(j)])    
-            start += SESSION_PARAMS['inter_blank']
+            start += session_params['inter_blank']
             # update the new starting point for the next stim
-    if SESSION_PARAMS['gratings_dur'] != 0:
-        grt.set_display_sequence([(start, (start + SESSION_PARAMS['gratings_dur']*14.7))])
+    if session_params['gratings_dur'] != 0:
+        grt.set_display_sequence([(start, (start + session_params['gratings_dur']*14.7))])
         stimuli.append(grt)
-        
+
     # prepare path for file saving
     frames_path = ""
     if save_frames:
