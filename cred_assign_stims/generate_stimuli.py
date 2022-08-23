@@ -143,6 +143,14 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
         window_kwargs["warp"] = Warp.Spherical
     
     window = Window(**window_kwargs)
+
+    stim_order = []
+    sq_order = []
+    gab_order = []
+    rot_gab_order = []
+    mov_order = []
+    grt_order = []
+    gab_block_order = []
    
     # initialize the stimuli
     if session_params['gab_dur'] != 0:
