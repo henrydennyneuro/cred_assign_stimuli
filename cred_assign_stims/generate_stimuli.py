@@ -107,10 +107,12 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                                  default: 0
     """
 
+    recapitulate = raw_input("Are you recapitulating a specific session? y/n: ")
+
     # Get Pickle from experimental run
     path = "C:/Users/Henry Denny/camstim/output/"
-    filename = input("Which file are you recapitulating?")
-    if filename == 'Test'
+    filename = raw_input("Which file are you recapitulating? ")
+    if filename == 'test':
         filename = '220710202030-full_pipeline_script'
     fnm_glob = path + filename + "*.pkl"
 
@@ -128,8 +130,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
 
     # Get seed
     session_structure['seed'] = stim_data['stimuli'][12]['stim_params']['session_params']['seed']
-    print(session_structure['seed'])
-    
+
     # Get movie display_sequences
     keys = range(12)
     movcount = 0
@@ -161,11 +162,11 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     
     check_reproduce(monitor, fullscreen=fullscreen, raise_error=False)
 
-    if seed is None:
+    if recapitulate == 'n':
             # randomly set a seed for the session
         session_params["seed"] = random.randint(1, 10000)
     else:
-        session_params["seed"] = seed
+        session_params["seed"] = session_structure['seed']
     logging.info("Seed: {}".format(session_params["seed"]))
     session_params["rng"] = np.random.RandomState(session_params["seed"])
 
@@ -196,6 +197,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     mov_order = []
     grt_order = []
     gab_block_order = []
+    interperator = 0
    
     # initialize the stimuli
     if session_params['gab_dur'] != 0:
@@ -280,24 +282,30 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                 # update the new starting point for the next stim
                 start += session_params['sq_dur'] + session_params['inter_blank'] 
         elif i == 'm':
-            if session_params['type'] == 'ophys':
-                for ii in np.arange(session_params['movie_blocks']):
-                    propblocksshuf = np.random.permutation(propblocks)
-                    for j in propblocksshuf:
-                        displayorder[str(j)].append((start, start+(MOVIE_PARAMS['movie_len'])-1))
-                        start += MOVIE_PARAMS['movie_len']
-                for j in np.arange(MOVIE_PARAMS['vids_per_block']):
-                    mov[str(j)].set_display_sequence(displayorder[str(j)])
-                    stimuli.append(mov[str(j)])
-            elif session_params['type'] == 'hab':
-                for ii in np.arange(session_params['movie_blocks']):
-                    propblocksshuf = np.random.permutation(propblocks)
-                    for j in propblocksshuf:
-                        displayorder[str(j)].append((start, start+(MOVIE_PARAMS['movie_len'])-1))
-                        start += MOVIE_PARAMS['movie_len']
-                for j in np.arange(0, MOVIE_PARAMS['vids_per_block'], 4):
-                    mov[str(j)].set_display_sequence(displayorder[str(j)])
-                    stimuli.append(mov[str(j)])    
+            if recapitulate == 'n':    
+                if session_params['type'] == 'ophys':
+                    for ii in np.arange(session_params['movie_blocks']):
+                        propblocksshuf = np.random.permutation(propblocks)
+                        for j in propblocksshuf:
+                            displayorder[str(j)].append((start, start+(MOVIE_PARAMS['movie_len'])-1))
+                            start += MOVIE_PARAMS['movie_len']
+                    for j in np.arange(MOVIE_PARAMS['vids_per_block']):
+                        mov[str(j)].set_display_sequence(displayorder[str(j)])
+                        stimuli.append(mov[str(j)])
+                elif session_params['type'] == 'hab':
+                    for ii in np.arange(session_params['movie_blocks']):
+                        propblocksshuf = np.random.permutation(propblocks)
+                        for j in propblocksshuf:
+                            displayorder[str(j)].append((start, start+(MOVIE_PARAMS['movie_len'])-1))
+                            start += MOVIE_PARAMS['movie_len']
+                    for j in np.arange(0, MOVIE_PARAMS['vids_per_block'], 4):
+                        mov[str(j)].set_display_sequence(displayorder[str(j)])
+                        stimuli.append(mov[str(j)])
+            elif recapitulate == 'y':
+                for j in session_structure['display_sequence']:
+                    mov[str(interperator)].set_display_sequence(session_structure['display_sequence'][str(j)])
+                    interperator = interperator + 1
+
             start += session_params['inter_blank']
             # update the new starting point for the next stim
     if session_params['gratings_dur'] != 0:
