@@ -197,7 +197,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     mov_order = []
     grt_order = []
     gab_block_order = []
-    interperator = 0
+    interpreter = 0
    
     # initialize the stimuli
     if session_params['gab_dur'] != 0:
@@ -304,7 +304,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
             elif recapitulate == 'y':
                 for j in session_structure['display_sequence']:
                     mov[str(interperator)].set_display_sequence(session_structure['display_sequence'][str(j)])
-                    interperator = interperator + 1
+                    interpreter = interpreter + 1
 
             start += session_params['inter_blank']
             # update the new starting point for the next stim
