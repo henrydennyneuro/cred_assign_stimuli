@@ -150,6 +150,9 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
 
     #Get gratings parameters - still working on this.
 
+    session_structure['grt_sweep_order'] = stim_data['stimuli'][16]['sweep_order']
+    session_structure['grt_sweep_table'] = stim_data['stimuli'][16]['sweep_table']
+
     # Record orientations of gabors at each sweep (LEAVE AS TRUE)
     recordOris = True
 
@@ -230,6 +233,8 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
         grt = stimulus_params.init_run_gratings(window, session_params.copy())
         stim_order.append('grt')
 
+    print(grt.sweep_order[:10])
+
     # initialize display order and times
     session_params['rng'].shuffle(stim_order) # in place shuffling
     session_params['rng'].shuffle(sq_order) # in place shuffling
@@ -303,12 +308,15 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                         stimuli.append(mov[str(j)])
             elif recapitulate == 'y':
                 for j in session_structure['display_sequence']:
-                    mov[str(interperator)].set_display_sequence(session_structure['display_sequence'][str(j)])
+                    mov[str(interpreter)].set_display_sequence(session_structure['display_sequence'][str(j)])
                     interpreter = interpreter + 1
 
             start += session_params['inter_blank']
             # update the new starting point for the next stim
     if session_params['gratings_dur'] != 0:
+        if recapitulate == 'y':
+            grt.sweep_order = session_structure['grt_sweep_order']
+            grt.sweep_table = session_structure['grt_sweep_table']
         grt.set_display_sequence([(start, (start + session_params['gratings_dur']*14.7))])
         stimuli.append(grt)
 
