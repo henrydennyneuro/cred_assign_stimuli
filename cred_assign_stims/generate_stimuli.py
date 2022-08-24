@@ -16,6 +16,8 @@ import logging
 import os
 import random
 import sys
+import pickle
+import glob as glob
 from win32api import GetSystemMetrics
 
 import numpy as np
@@ -104,6 +106,48 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
         - save_from_frame (int): Frame as of which to start saving frames, if saving
                                  default: 0
     """
+
+    # Get Pickle from experimental run
+    path = "C:/Users/Henry Denny/camstim/output/"
+    filename = input("Which file are you recapitulating?")
+    if filename == 'Test'
+        filename = '220710202030-full_pipeline_script'
+    fnm_glob = path + filename + "*.pkl"
+
+    fnm = glob.glob(fnm_glob)[0]
+
+    with open(fnm, 'rb') as file:
+        stim_data = pickle.load(file)
+
+    # Setup session_structure dictionary, into which we will import the structure of the
+    # experimental run
+    session_structure = {
+        "seed": "None",
+        "display_sequence": {}
+    }
+
+    # Get seed
+    session_structure['seed'] = stim_data['stimuli'][12]['stim_params']['session_params']['seed']
+    print(session_structure['seed'])
+    
+    # Get movie display_sequences
+    keys = range(12)
+    movcount = 0
+    varicount = 0
+    movkeys = []
+
+    for j in keys:
+        movkeys.append('m' + str(movcount) + str(varicount))
+        if varicount != 3:
+            varicount = varicount+1
+        else:
+            varicount = 0
+            movcount = movcount + 1
+        
+    for i in keys:
+        session_structure['display_sequence'][movkeys[i]] = stim_data['stimuli'][i]['display_sequence']
+
+    #Get gratings parameters - still working on this.
 
     # Record orientations of gabors at each sweep (LEAVE AS TRUE)
     recordOris = True
