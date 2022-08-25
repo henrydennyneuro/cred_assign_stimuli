@@ -146,10 +146,13 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
             movcount = movcount + 1
         
     for i in keys:
-        session_structure['display_sequence'][movkeys[i]] = stim_data['stimuli'][i]['display_sequence']
+        holder = []
+        for j in range(session_params['movie_blocks']):
+            holder.append((stim_data['stimuli'][i]['display_sequence'][j][0], \
+                stim_data['stimuli'][i]['display_sequence'][j][0]+9))
+        session_structure['display_sequence'][movkeys[i]] = holder
 
-    #Get gratings parameters - still working on this.
-
+    #Get gratings parameters
     session_structure['grt_sweep_order'] = stim_data['stimuli'][16]['sweep_order']
     session_structure['grt_sweep_table'] = stim_data['stimuli'][16]['sweep_table']
 
@@ -233,15 +236,13 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
         grt = stimulus_params.init_run_gratings(window, session_params.copy())
         stim_order.append('grt')
 
-    print(grt.sweep_order[:10])
-
     # initialize display order and times
     session_params['rng'].shuffle(stim_order) # in place shuffling
     session_params['rng'].shuffle(sq_order) # in place shuffling
     session_params['rng'].shuffle(gab_order) # in place shuffling
     session_params['rng'].shuffle(rot_gab_order) # in place shuffling
     session_params['rng'].shuffle(gab_block_order) # in place shuffling
-
+    
     displayorder = {}
     if session_params['type'] == 'ophys':    
         for i in np.arange(MOVIE_PARAMS['vids_per_block']):
@@ -252,6 +253,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
 
     start = session_params["pre_blank"] # initial blank
     stimuli = []
+    
     for i in stim_order:
         if i == 'g':
             for l in gab_block_order:
@@ -309,7 +311,9 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
             elif recapitulate == 'y':
                 for j in session_structure['display_sequence']:
                     mov[str(interpreter)].set_display_sequence(session_structure['display_sequence'][str(j)])
-                    interpreter = interpreter + 1
+                    stimuli.append(mov[str(interpreter)])
+                    interpreter += 1
+                    start += MOVIE_PARAMS['movie_len']*session_params['movie_blocks'] 
 
             start += session_params['inter_blank']
             # update the new starting point for the next stim
