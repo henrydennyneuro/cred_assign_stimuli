@@ -135,15 +135,15 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     keys = range(12)
     movcount = 0
     varicount = 0
-    movkeys = []
+    movkeys = range(12)
 
-    for j in keys:
-        movkeys.append('m' + str(movcount) + str(varicount))
-        if varicount != 3:
-            varicount = varicount+1
-        else:
-            varicount = 0
-            movcount = movcount + 1
+    # for j in keys:
+    #     movkeys.append('m' + str(movcount) + str(varicount))
+    #     if varicount != 3:
+    #         varicount = varicount+1
+    #     else:
+    #         varicount = 0
+    #         movcount = movcount + 1
         
     for i in keys:
         holder = []
@@ -309,10 +309,9 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                         mov[str(j)].set_display_sequence(displayorder[str(j)])
                         stimuli.append(mov[str(j)])
             elif recapitulate == 'y':
-                for j in session_structure['display_sequence']:
-                    mov[str(interpreter)].set_display_sequence(session_structure['display_sequence'][str(j)])
-                    stimuli.append(mov[str(interpreter)])
-                    interpreter += 1
+                for j in range(12):
+                    mov[str(j)].set_display_sequence(session_structure['display_sequence'][j])
+                    stimuli.append(mov[str(j)])
                     start += MOVIE_PARAMS['movie_len']*session_params['movie_blocks'] 
 
             start += session_params['inter_blank']
