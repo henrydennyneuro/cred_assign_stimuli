@@ -110,11 +110,13 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     recapitulate = raw_input("Are you recapitulating a specific session? y/n: ")
 
     # Get Pickle from experimental run
+     # Get Pickle from experimental run
     path = "C:/Users/Henry Denny/camstim/output/"
     filename = raw_input("Which file are you recapitulating? ")
     if filename == 'test':
         filename = '220710202030-full_pipeline_script'
     fnm_glob = path + filename + "*.pkl"
+
 
     fnm = glob.glob(fnm_glob)[0]
 
@@ -124,12 +126,18 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     # Setup session_structure dictionary, into which we will import the structure of the
     # experimental run
     session_structure = {
-        "seed": "None",
-        "display_sequence": {}
+     #   "seed": "None",
+        "display_sequence": {},
+        "grt_sweep_order": 0,
+        "grt_sweep_table": 0,
+      #  "prev_session_params": 0,
     }
 
+    # Get previous session params
+    session_params = stim_data['stimuli'][12]['stim_params']['session_params']
+
     # Get seed
-    session_structure['seed'] = stim_data['stimuli'][12]['stim_params']['session_params']['seed']
+    #session_structure['seed'] = stim_data['stimuli'][12]['stim_params']['session_params']['seed']
 
     # Get movie display_sequences
     keys = range(12)
@@ -171,8 +179,8 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     if recapitulate == 'n':
             # randomly set a seed for the session
         session_params["seed"] = random.randint(1, 10000)
-    else:
-        session_params["seed"] = session_structure['seed']
+    #else:
+    #    session_params["seed"] = session_structure['seed']
     logging.info("Seed: {}".format(session_params["seed"]))
     session_params["rng"] = np.random.RandomState(session_params["seed"])
 
