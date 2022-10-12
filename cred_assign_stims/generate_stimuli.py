@@ -114,7 +114,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     path = "C:/Users/Henry Denny/camstim/output/"
     filename = raw_input("Which file are you recapitulating? ")
     if filename == 'test':
-        filename = '220710202030-full_pipeline_script'
+        filename = '221011153030-full_pipeline_script'
     fnm_glob = path + filename + "*.pkl"
 
 
@@ -127,33 +127,28 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     # experimental run
     session_structure = {
      #   "seed": "None",
-        "display_sequence": {},
-        "grt_sweep_order": 0,
-        "grt_sweep_table": 0,
+        'display_sequence': {},
+        'grt_sweep_order': [],
+        'grt_sweep_table': [],
       #  "prev_session_params": 0,
     }
 
     # Get previous session params
-    session_params = stim_data['stimuli'][12]['stim_params']['session_params']
+    for i in range(len(stim_data['stimuli'])):
+        if 'stim_params' in stim_data['stimuli'][i]:
+            session_params = stim_data['stimuli'][i]['stim_params']['session_params']
 
     # Get seed
     #session_structure['seed'] = stim_data['stimuli'][12]['stim_params']['session_params']['seed']
 
     # Get movie display_sequences
-    keys = range(12)
+    keys = range(len(stim_data['stimuli']))
     movcount = 0
     varicount = 0
-    movkeys = range(12)
-
-    # for j in keys:
-    #     movkeys.append('m' + str(movcount) + str(varicount))
-    #     if varicount != 3:
-    #         varicount = varicount+1
-    #     else:
-    #         varicount = 0
-    #         movcount = movcount + 1
+    movkeys = range(len(stim_data['stimuli']))
         
     for i in keys:
+        print(i)
         holder = []
         for j in range(session_params['movie_blocks']):
             holder.append((stim_data['stimuli'][i]['display_sequence'][j][0], \
@@ -161,8 +156,8 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
         session_structure['display_sequence'][movkeys[i]] = holder
 
     #Get gratings parameters
-    session_structure['grt_sweep_order'] = stim_data['stimuli'][16]['sweep_order']
-    session_structure['grt_sweep_table'] = stim_data['stimuli'][16]['sweep_table']
+    session_structure['grt_sweep_order'] = stim_data['stimuli'][len(stim_data['stimuli'])-1]['sweep_order']
+    session_structure['grt_sweep_table'] = stim_data['stimuli'][len(stim_data['stimuli'])-1]['sweep_table']
 
     # Record orientations of gabors at each sweep (LEAVE AS TRUE)
     recordOris = True
@@ -317,10 +312,17 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                         mov[str(j)].set_display_sequence(displayorder[str(j)])
                         stimuli.append(mov[str(j)])
             elif recapitulate == 'y':
-                for j in range(12):
-                    mov[str(j)].set_display_sequence(session_structure['display_sequence'][j])
-                    stimuli.append(mov[str(j)])
-                    start += MOVIE_PARAMS['movie_len']*session_params['movie_blocks'] 
+                if session_params['type'] == 'ophys':
+                    for j in range(12):
+                        mov[str(j)].set_display_sequence(session_structure['display_sequence'][j])
+                        stimuli.append(mov[str(j)])
+                        start += MOVIE_PARAMS['movie_len']*session_params['movie_blocks']
+                if session_params['type'] == 'hab':
+                    for j in range(4):
+                        mov[str(j)].set_display_sequence(session_structure['display_sequence'][j])
+                        stimuli.append(mov[str(j)])
+                        start += MOVIE_PARAMS['movie_len']*session_params['movie_blocks']
+
 
             start += session_params['inter_blank']
             # update the new starting point for the next stim
