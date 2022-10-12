@@ -146,7 +146,6 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     movcount = 0
     varicount = 0
     counter = 0
-    movkeys = np.arange(len(stim_data['stimuli']))
 
     # Find which stimuli contain movies
     for i in np.arange(len(stim_data['stimuli'])):
@@ -161,6 +160,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
             # holder.append((stim_data['stimuli'][i]['display_sequence'][j][l], \
             #     stim_data['stimuli'][i]['display_sequence'][j][l]+9))
         session_structure['display_sequence'][counter] = holder
+        print(session_structure['display_sequence'][counter])
         counter = counter + 1
     # print(session_structure['display_sequence'].keys())
     # print(session_structure['display_sequence'][0])
@@ -331,10 +331,13 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                         stimuli.append(mov[str(j)])
                         start += MOVIE_PARAMS['movie_len']*session_params['movie_blocks']
                 if session_params['type'] == 'hab':
-                    for j in range(3):
-                        print(session_structure['display_sequence'][j])
-                        mov[str(j)].set_display_sequence(session_structure['display_sequence'][j])
-                        stimuli.append(mov[str(j)])
+                    movkeys = ['0','4','8']
+                    counter = 0
+                    for j in movkeys:
+                        print(counter)
+                        mov[j].set_display_sequence(session_structure['display_sequence'][counter])
+                        stimuli.append(mov[j])
+                        counter = counter + 1
                         print(start)
             start += MOVIE_PARAMS['movie_len']*MOVIE_PARAMS['vids_per_block']*session_params['movie_blocks']
             print(start)
