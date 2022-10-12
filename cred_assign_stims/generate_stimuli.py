@@ -142,18 +142,31 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     #session_structure['seed'] = stim_data['stimuli'][12]['stim_params']['session_params']['seed']
 
     # Get movie display_sequences
-    keys = range(len(stim_data['stimuli']))
+    keys = []
     movcount = 0
     varicount = 0
-    movkeys = range(len(stim_data['stimuli']))
-        
+    counter = 0
+    movkeys = np.arange(len(stim_data['stimuli']))
+
+    # Find which stimuli contain movies
+    for i in np.arange(len(stim_data['stimuli'])):
+        if 'movie_path' in stim_data['stimuli'][i]:
+            keys.append(i)
+
+    # Retrieve movie clip display times.    
     for i in keys:
-        print(i)
         holder = []
-        for j in range(session_params['movie_blocks']):
-            holder.append((stim_data['stimuli'][i]['display_sequence'][j][0], \
-                stim_data['stimuli'][i]['display_sequence'][j][0]+9))
-        session_structure['display_sequence'][movkeys[i]] = holder
+        holder = stim_data['stimuli'][i]['display_sequence']
+        # for j in np.arange(session_params['movie_blocks']):
+            # holder.append((stim_data['stimuli'][i]['display_sequence'][j][l], \
+            #     stim_data['stimuli'][i]['display_sequence'][j][l]+9))
+        session_structure['display_sequence'][counter] = holder
+        counter = counter + 1
+    # print(session_structure['display_sequence'].keys())
+    # print(session_structure['display_sequence'][0])
+    # print(session_structure['display_sequence'][1])
+    # print(session_structure['display_sequence'][2])
+
 
     #Get gratings parameters
     session_structure['grt_sweep_order'] = stim_data['stimuli'][len(stim_data['stimuli'])-1]['sweep_order']
@@ -318,12 +331,13 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                         stimuli.append(mov[str(j)])
                         start += MOVIE_PARAMS['movie_len']*session_params['movie_blocks']
                 if session_params['type'] == 'hab':
-                    for j in range(4):
+                    for j in range(3):
+                        print(session_structure['display_sequence'][j])
                         mov[str(j)].set_display_sequence(session_structure['display_sequence'][j])
                         stimuli.append(mov[str(j)])
-                        start += MOVIE_PARAMS['movie_len']*session_params['movie_blocks']
-
-
+                        print(start)
+            start += MOVIE_PARAMS['movie_len']*MOVIE_PARAMS['vids_per_block']*session_params['movie_blocks']
+            print(start)
             start += session_params['inter_blank']
             # update the new starting point for the next stim
     if session_params['gratings_dur'] != 0:
