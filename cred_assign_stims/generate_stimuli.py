@@ -114,19 +114,21 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     path = "C:/Users/Henry Denny/camstim/output/"
     filename = raw_input("Which file are you recapitulating? ")
     if filename == 'test':
-        filename = '221011153030-full_pipeline_script'
+        filename = '220825130627-full_pipeline_script'
     fnm_glob = path + filename + "*.pkl"
-
 
     fnm = glob.glob(fnm_glob)[0]
 
     with open(fnm, 'rb') as file:
         stim_data = pickle.load(file)
 
+    print(filename)
+
     # Setup session_structure dictionary, into which we will import the structure of the
     # experimental run
     session_structure = {
      #   "seed": "None",
+        'size': 0,
         'display_sequence': {},
         'grt_sweep_order': [],
         'grt_sweep_table': [],
@@ -137,6 +139,8 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     for i in range(len(stim_data['stimuli'])):
         if 'stim_params' in stim_data['stimuli'][i]:
             session_params = stim_data['stimuli'][i]['stim_params']['session_params']
+            retrieved_rng = stim_data['stimuli'][i]['stim_params']['session_params']['rng']
+            session_structure['size'] = stim_data['monitor']['sizepix']
 
     # Get seed
     #session_structure['seed'] = stim_data['stimuli'][12]['stim_params']['session_params']['seed']
@@ -160,14 +164,8 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
             # holder.append((stim_data['stimuli'][i]['display_sequence'][j][l], \
             #     stim_data['stimuli'][i]['display_sequence'][j][l]+9))
         session_structure['display_sequence'][counter] = holder
-        print(session_structure['display_sequence'][counter])
         counter = counter + 1
-    # print(session_structure['display_sequence'].keys())
-    # print(session_structure['display_sequence'][0])
-    # print(session_structure['display_sequence'][1])
-    # print(session_structure['display_sequence'][2])
-
-
+    
     #Get gratings parameters
     session_structure['grt_sweep_order'] = stim_data['stimuli'][len(stim_data['stimuli'])-1]['sweep_order']
     session_structure['grt_sweep_table'] = stim_data['stimuli'][len(stim_data['stimuli'])-1]['sweep_table']
@@ -190,7 +188,9 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     #else:
     #    session_params["seed"] = session_structure['seed']
     logging.info("Seed: {}".format(session_params["seed"]))
-    session_params["rng"] = np.random.RandomState(session_params["seed"])
+    #session_params["rng"] = np.random.RandomState(session_params["seed"])
+    session_params["rng"] = retrieved_rng
+
 
     # check session params add up to correct total time
     tot_calc = session_params["pre_blank"] + session_params["post_blank"] + \
@@ -207,9 +207,15 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
         "monitor": monitor, # Will be set to a gamma calibrated profile by MPE
         "screen" : 0,
     }
+    
     if warp:
         window_kwargs["warp"] = Warp.Spherical
-    
+
+    if recapitulate == 'y':
+        window_kwargs["warp"] = Warp.Spherical
+        window_kwargs["fullscr"] = False     
+        window_kwargs["size"] = session_structure['size']
+
     window = Window(**window_kwargs)
 
     stim_order = []
@@ -334,13 +340,10 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                     movkeys = ['0','4','8']
                     counter = 0
                     for j in movkeys:
-                        print(counter)
                         mov[j].set_display_sequence(session_structure['display_sequence'][counter])
                         stimuli.append(mov[j])
                         counter = counter + 1
-                        print(start)
             start += MOVIE_PARAMS['movie_len']*MOVIE_PARAMS['vids_per_block']*session_params['movie_blocks']
-            print(start)
             start += session_params['inter_blank']
             # update the new starting point for the next stim
     if session_params['gratings_dur'] != 0:
