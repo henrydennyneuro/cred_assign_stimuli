@@ -107,14 +107,14 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                                  default: 0
     """
 
-    recapitulate = raw_input("Are you recapitulating a specific session? y/n: ")
-
+    #recapitulate = raw_input("Are you recapitulating a specific session? y/n: ")
+    recapitulate = 'y'
     # Get Pickle from experimental run
      # Get Pickle from experimental run
     path = "C:/Users/Henry Denny/camstim/output/"
-    filename = raw_input("Which file are you recapitulating? ")
-    if filename == 'test':
-        filename = '221024190717-full_pipeline_script'
+    #filename = raw_input("Which file are you recapitulating? ")
+    #if filename == 'test':
+    filename = '221025143830-full_pipeline_script_ophys_mgb'
     fnm_glob = path + filename + "*.pkl"
 
     fnm = glob.glob(fnm_glob)[0]
@@ -152,21 +152,20 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     ophyskeys = ['m00', 'm01', 'm02','m03', 'm10', 'm11', 'm12', 'm13', 'm20', 'm21', 'm22', 'm23']
     movcount = 0
     varicount = 0
-    counter = 0
 
     # Find which stimuli contain movies
     for i in np.arange(len(stim_data['stimuli'])):
         if 'movie_path' in stim_data['stimuli'][i]:
             keys.append(i)
-
+    
     # Retrieve movie clip display times.    
     if session_params['type'] == 'ophys':
-        for i in keys:
-            session_structure['display_sequence'][str(ophyskeys[i])] = stim_data['stimuli'][i]['display_sequence']
-            print(ophyskeys[i])
+        session_structure['display_sequence'] = dict.fromkeys(ophyskeys)
+        for i, j in enumerate(keys):
+            session_structure['display_sequence'][str(ophyskeys[i])] = stim_data['stimuli'][j]['display_sequence']
     elif session_params['type'] == 'hab':
-        for i in keys:
-            print(habkeys[i])
+        session_structure['display_sequence'] = dict.fromkeys(habkeys)
+        for i, j in enumerate(keys):
             session_structure['display_sequence'][str(habkeys[i])] = stim_data['stimuli'][i]['display_sequence']
         
     #Get gratings parameters
@@ -196,9 +195,9 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     #session_params["rng"] = np.random.RandomState(session_params["seed"])
     #session_params["rng"] = retrieved_rng
 
-    print('Recap RandomState = ' + str(session_params["rng"].get_state()[1][1]))
-    print(spare[1][1])
-    print(np.subtract(session_params["rng"].get_state()[1], spare[1]))
+    # print('Recap RandomState = ' + str(session_params["rng"].get_state()[1][1]))
+    # print(spare[1][1])
+    # print(np.subtract(session_params["rng"].get_state()[1], spare[1]))
 
     # check session params add up to correct total time
     tot_calc = session_params["pre_blank"] + session_params["post_blank"] + \
@@ -288,7 +287,6 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     start = session_params["pre_blank"] # initial blank
     stimuli = []
     
-    print('t at start' + str(start/60))
     for i in stim_order:
         if i == 'g':
             for l in gab_block_order:
@@ -315,7 +313,6 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                         print('t after rg' + str(start/60))
                         # update the new starting point for the next stim
                 start += session_params['inter_blank']
-                print('t after interblank' + str(start))
         elif i == 'b':
             for j in sq_order:
                 if j == 'l':
@@ -347,18 +344,14 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                         mov[str(j)].set_display_sequence(displayorder[str(j)])
                         stimuli.append(mov[str(j)])
             elif recapitulate == 'y':
-                print(session_params['type'])
                 if session_params['type'] == 'ophys':
-                    for j in keys:
-                        mov[str(j)].set_display_sequence(session_structure['display_sequence'][ophyskeys[j]])
-                        stimuli.append(mov[str(j)])
+                    for l, j in enumerate(keys):
+                        mov[str(l)].set_display_sequence(session_structure['display_sequence'][ophyskeys[l]])
+                        stimuli.append(mov[str(l)])
                 if session_params['type'] == 'hab':
-                    counter = 0
-                    for j in keys:
-                        mov[j].set_display_sequence(session_structure['display_sequence'][habkeys[j]])
-                        stimuli.append(mov[j])
-                        counter = counter + 1
-                        print(counter)
+                    for l, j in enumerate(keys):
+                        mov[str(l)].set_display_sequence(session_structure['display_sequence'][habkeys[l]])
+                        stimuli.append(mov[str(l)])
             start += MOVIE_PARAMS['movie_len']*MOVIE_PARAMS['vids_per_block']*session_params['movie_blocks']
             start += session_params['inter_blank']
             # update the new starting point for the next stim
