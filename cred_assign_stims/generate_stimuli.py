@@ -114,7 +114,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     path = "C:/Users/Henry Denny/camstim/output/"
     #filename = raw_input("Which file are you recapitulating? ")
     #if filename == 'test':
-    filename = '221025143830-full_pipeline_script_ophys_mgb'
+    filename = '221025144336-full_pipeline_script_ophys_gbm'
     fnm_glob = path + filename + "*.pkl"
 
     fnm = glob.glob(fnm_glob)[0]
@@ -144,7 +144,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
             session_structure['size'] = stim_data['monitor']['sizepix']
 
     # Get seed
-    #session_structure['seed'] = stim_data['stimuli'][12]['stim_params']['session_params']['seed']
+    session_structure['seed'] = stim_data['stimuli'][0]['stim_params']['session_params']['seed']
 
     # Get movie display_sequences
     keys = []
@@ -186,18 +186,27 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
 
     spare = session_params["rng"].get_state()
     
-    if recapitulate == 'n':
+    #if recapitulate == 'n':
             # randomly set a seed for the session
-        session_params["seed"] = random.randint(1, 10000)
+        #session_params["seed"] = random.randint(1, 10000)
     #else:
     #    session_params["seed"] = session_structure['seed']
     logging.info("Seed: {}".format(session_params["seed"]))
     #session_params["rng"] = np.random.RandomState(session_params["seed"])
-    #session_params["rng"] = retrieved_rng
+    # recapRS = np.random.RandomState(session_params["seed"])
+    # session_params["rng"] = retrieved_rng
+    # print(retrieved_rng.get_state()[1][1])
+
+    session_params['rng'] = np.random.RandomState(session_params['seed'])
+    # print('sum rs = '+str(np.subtract(session_params["rng"].get_state()[1], recapRS.get_state()[1][1])))
 
     # print('Recap RandomState = ' + str(session_params["rng"].get_state()[1][1]))
     # print(spare[1][1])
     # print(np.subtract(session_params["rng"].get_state()[1], spare[1]))
+    # print(np.subtract(recapRS.get_state()[1][1], spare[1]))
+    # print(recapRS.get_state()[1][1])
+
+
 
     # check session params add up to correct total time
     tot_calc = session_params["pre_blank"] + session_params["post_blank"] + \
@@ -208,12 +217,20 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
               .format(session_params["session_dur"], tot_calc))
 
     # Create display window
-    window_kwargs = {
-        "fullscr": fullscreen,
-        "size"   : monitor.getSizePix(), # May return an error due to size. Ignore.
-        "monitor": monitor, # Will be set to a gamma calibrated profile by MPE
-        "screen" : 0,
-    }
+    if recapitulate == 'y':
+        window_kwargs = {
+            "fullscr": fullscreen,
+            "size"   : [stim_data['wwidth'], stim_data['wheight']], # May return an error due to size. Ignore.
+            "monitor": monitor, # Will be set to a gamma calibrated profile by MPE
+            "screen" : 0,
+            }
+    else: 
+        window_kwargs = {
+            "fullscr": fullscreen,
+            "size"   : monitor.getSizePix(), # May return an error due to size. Ignore.
+            "monitor": monitor, # Will be set to a gamma calibrated profile by MPE
+            "screen" : 0,
+        }
     
     if warp:
         window_kwargs["warp"] = Warp.Spherical
@@ -221,7 +238,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     if recapitulate == 'y':
         window_kwargs["warp"] = Warp.Spherical
         window_kwargs["fullscr"] = False     
-        window_kwargs["size"] = session_structure['size']
+        #window_kwargs["size"] = session_structure['size']
 
     window = Window(**window_kwargs)
 
