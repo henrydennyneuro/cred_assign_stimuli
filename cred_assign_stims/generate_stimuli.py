@@ -107,14 +107,13 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                                  default: 0
     """
 
-    #recapitulate = raw_input("Are you recapitulating a specific session? y/n: ")
-    recapitulate = 'y'
+    recapitulate = raw_input("Are you recapitulating a specific session? y/n: ")
+    
     # Get Pickle from experimental run
-     # Get Pickle from experimental run
     path = "C:/Users/Henry Denny/camstim/output/"
-    #filename = raw_input("Which file are you recapitulating? ")
-    #if filename == 'test':
-    filename = '221019212612-full_pipeline_script'
+    filename = raw_input("Which file are you recapitulating? ")
+    if filename == 'test':
+        filename = '221019212612-full_pipeline_script'
     fnm_glob = path + filename + "*.pkl"
 
     fnm = glob.glob(fnm_glob)[0]
@@ -122,38 +121,29 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     with open(fnm, 'rb') as file:
         stim_data = pickle.load(file)
 
-    print(filename)
-
     # Setup session_structure dictionary, into which we will import the structure of the
     # experimental run
     session_structure = {
-     #   "seed": "None",
         'size': 0,
         'display_sequence': {},
         'grt_sweep_order': [],
         'grt_sweep_table': [],
         'mov_index_in_stimuli': [],
         'gb_index_in_stimuli': []
-      #  "prev_session_params": 0,
-    }
+     }
 
     # Get previous session params
     for i in np.arange(len(stim_data['stimuli'])):
         if 'stim_params' in stim_data['stimuli'][i]:
             session_params = stim_data['stimuli'][i]['stim_params']['session_params']
             retrieved_rng = stim_data['stimuli'][i]['stim_params']['session_params']['rng']
-            print(retrieved_rng.get_state()[1][1])
             session_structure['size'] = stim_data['monitor']['sizepix']
             session_structure['gb_index_in_stimuli'].append(i)
-        else:
-            session_structure['mov_index_in_stimuli'].append(i)
-    print(session_structure['mov_index_in_stimuli'])
-    print(session_structure['gb_index_in_stimuli'])
-
+        
     # Get seed
     session_structure['seed'] = stim_data['stimuli'][session_structure['gb_index_in_stimuli'][0]]['stim_params']['session_params']['seed']
 
-    # Get movie display_sequences
+    # Initialise keys used to link movies to stim times
     keys = []
     habkeys = ['m00', 'm10', 'm20']
     ophyskeys = ['m00', 'm01', 'm02','m03', 'm10', 'm11', 'm12', 'm13', 'm20', 'm21', 'm22', 'm23']
@@ -191,30 +181,10 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     
     check_reproduce(monitor, fullscreen=fullscreen, raise_error=False)
 
-    spare = session_params["rng"].get_state()
-    
-    #if recapitulate == 'n':
-            # randomly set a seed for the session
-        #session_params["seed"] = random.randint(1, 10000)
-    #else:
-    #    session_params["seed"] = session_structure['seed']
+    # Set RandomState with retrieved seed
     logging.info("Seed: {}".format(session_params["seed"]))
-    #session_params["rng"] = np.random.RandomState(session_params["seed"])
-    # recapRS = np.random.RandomState(session_params["seed"])
-    # session_params["rng"] = retrieved_rng
-    # print(retrieved_rng.get_state()[1][1])
-
     session_params['rng'] = np.random.RandomState(session_params['seed'])
-    # print('sum rs = '+str(np.subtract(session_params["rng"].get_state()[1], recapRS.get_state()[1][1])))
-
-    # print('Recap RandomState = ' + str(session_params["rng"].get_state()[1][1]))
-    # print(spare[1][1])
-    # print(np.subtract(session_params["rng"].get_state()[1], spare[1]))
-    # print(np.subtract(recapRS.get_state()[1][1], spare[1]))
-    # print(recapRS.get_state()[1][1])
-
-
-
+    
     # check session params add up to correct total time
     tot_calc = session_params["pre_blank"] + session_params["post_blank"] + \
                2 * session_params["inter_blank"] + session_params["gab_dur"] + \
@@ -256,8 +226,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     mov_order = []
     grt_order = []
     gab_block_order = []
-    interpreter = 0
-   
+    
     # initialize the stimuli
     if session_params['gab_dur'] != 0:
         gb_1 = stimulus_params.init_run_gabors(window, session_params.copy(), recordOris, surp=2)
@@ -289,17 +258,14 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
         grt = stimulus_params.init_run_gratings(window, session_params.copy())
         stim_order.append('grt')
 
-    print(stim_order)
-
-    # initialize display order and times
+    # Shuffle orders
     session_params['rng'].shuffle(stim_order) # in place shuffling
     session_params['rng'].shuffle(sq_order) # in place shuffling
     session_params['rng'].shuffle(gab_order) # in place shuffling
     session_params['rng'].shuffle(rot_gab_order) # in place shuffling
     session_params['rng'].shuffle(gab_block_order) # in place shuffling
-
-    print(stim_order)
     
+    # initialize display order and times
     displayorder = {}
     if session_params['type'] == 'ophys':    
         for i in np.arange(MOVIE_PARAMS['vids_per_block']):
@@ -325,7 +291,6 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                             gb_2.set_display_sequence([(start, start+session_params['gab_dur'])])
                         # update the new starting point for the next stim
                         start += session_params['gab_dur'] 
-                        print('t after fg' + str(start/60))
                 elif l == 2:
                     for j in rot_gab_order:
                         if j == 1:
@@ -335,7 +300,6 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                             stimuli.append(rgb_2)
                             rgb_2.set_display_sequence([(start, start+session_params['rot_gab_dur'])])
                         start += session_params['gab_dur']
-                        print('t after rg' + str(start/60))
                         # update the new starting point for the next stim
                 start += session_params['inter_blank']
         elif i == 'b':
@@ -375,9 +339,6 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                         stimuli.append(mov[str(l)])
                 if session_params['type'] == 'hab':
                     for l, j in enumerate(habkeys):
-                        print(l)
-                        print(habkeys[l])
-                        print(ID)
                         mov[str(ID)].set_display_sequence(session_structure['display_sequence'][habkeys[l]])
                         stimuli.append(mov[str(ID)])
                         ID = ID + 4 
