@@ -114,7 +114,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
     path = "C:/Users/Henry Denny/camstim/output/"
     #filename = raw_input("Which file are you recapitulating? ")
     #if filename == 'test':
-    filename = '221025144336-full_pipeline_script_ophys_gbm'
+    filename = '221019212612-full_pipeline_script'
     fnm_glob = path + filename + "*.pkl"
 
     fnm = glob.glob(fnm_glob)[0]
@@ -144,7 +144,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
             session_structure['size'] = stim_data['monitor']['sizepix']
 
     # Get seed
-    session_structure['seed'] = stim_data['stimuli'][0]['stim_params']['session_params']['seed']
+    session_structure['seed'] = stim_data['stimuli'][6]['stim_params']['session_params']['seed']
 
     # Get movie display_sequences
     keys = []
@@ -303,6 +303,7 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
 
     start = session_params["pre_blank"] # initial blank
     stimuli = []
+    ID = 0
     
     for i in stim_order:
         if i == 'g':
@@ -366,9 +367,13 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
                         mov[str(l)].set_display_sequence(session_structure['display_sequence'][ophyskeys[l]])
                         stimuli.append(mov[str(l)])
                 if session_params['type'] == 'hab':
-                    for l, j in enumerate(keys):
-                        mov[str(l)].set_display_sequence(session_structure['display_sequence'][habkeys[l]])
-                        stimuli.append(mov[str(l)])
+                    for l, j in enumerate(habkeys):
+                        print(l)
+                        print(habkeys[l])
+                        print(ID)
+                        mov[str(ID)].set_display_sequence(session_structure['display_sequence'][habkeys[l]])
+                        stimuli.append(mov[str(ID)])
+                        ID = ID + 4 
             start += MOVIE_PARAMS['movie_len']*MOVIE_PARAMS['vids_per_block']*session_params['movie_blocks']
             start += session_params['inter_blank']
             # update the new starting point for the next stim
