@@ -132,19 +132,26 @@ def generate_stimuli(session_params, seed=None, save_frames="", save_directory="
         'display_sequence': {},
         'grt_sweep_order': [],
         'grt_sweep_table': [],
+        'mov_index_in_stimuli': [],
+        'gb_index_in_stimuli': []
       #  "prev_session_params": 0,
     }
 
     # Get previous session params
-    for i in range(len(stim_data['stimuli'])):
+    for i in np.arange(len(stim_data['stimuli'])):
         if 'stim_params' in stim_data['stimuli'][i]:
             session_params = stim_data['stimuli'][i]['stim_params']['session_params']
             retrieved_rng = stim_data['stimuli'][i]['stim_params']['session_params']['rng']
             print(retrieved_rng.get_state()[1][1])
             session_structure['size'] = stim_data['monitor']['sizepix']
+            session_structure['gb_index_in_stimuli'].append(i)
+        else:
+            session_structure['mov_index_in_stimuli'].append(i)
+    print(session_structure['mov_index_in_stimuli'])
+    print(session_structure['gb_index_in_stimuli'])
 
     # Get seed
-    session_structure['seed'] = stim_data['stimuli'][6]['stim_params']['session_params']['seed']
+    session_structure['seed'] = stim_data['stimuli'][session_structure['gb_index_in_stimuli'][0]]['stim_params']['session_params']['seed']
 
     # Get movie display_sequences
     keys = []
